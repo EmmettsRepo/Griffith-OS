@@ -1,0 +1,9 @@
+[package]
+name = "gos-platform"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gos-core = { path = "../gos-core" }
+rand = "0.8"

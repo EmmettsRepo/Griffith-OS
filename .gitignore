@@ -1,0 +1,25 @@
+# Rust
+/target
+**/target
+Cargo.lock.bak
+
+# Node / UI
+node_modules
+ui/dist
+ui/.vite
+*.log
+
+# Tauri
+src-tauri/gen
+src-tauri/target
+
+# Env / secrets — never commit
+.env
+.env.*
+*.key
+*.pem
+gos-identity.key
+
+# OS
+.DS_Store
+Thumbs.db

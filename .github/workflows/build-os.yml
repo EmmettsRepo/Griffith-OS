@@ -1,0 +1,52 @@
+name: Build GOS image
+
+# Validates the GOS NixOS config and builds a bootable x86_64 ISO on a Linux
+# runner — no local Nix or sudo needed. Download the ISO from the run's artifacts.
+on:
+  push:
+    paths:
+      - "os/**"
+      - ".github/workflows/build-os.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      # GNOME ISOs are large; reclaim runner disk first.
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Validate the OS config evaluates (no build)
+        working-directory: os
+        run: |
+          nix eval --raw 'path:.#nixosConfigurations.gos-workstation-x86.config.system.build.toplevel.drvPath'
+          echo "GOS standard config evaluates."
+
+      - name: Validate the anti-tracking (anonymous) config evaluates
+        working-directory: os
+        run: |
+          nix eval --raw 'path:.#nixosConfigurations.gos-workstation-anon-x86.config.system.build.toplevel.drvPath'
+          echo "GOS anonymous-mode config evaluates."
+
+      - name: Build bootable ISO (x86_64)
+        working-directory: os
+        run: nix build 'path:.#packages.x86_64-linux.iso' -L
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gos-iso-x86_64
+          path: os/result/iso/*.iso
+          if-no-files-found: error

@@ -1,0 +1,67 @@
+/* GOS design tokens — a disciplined "secure console" system.
+   Colors in oklch; one semantic accent that shifts with privacy state. */
+:root {
+  /* Layered near-black surfaces with a cool undertone */
+  --bg-0: oklch(14% 0.014 264);
+  --bg-1: oklch(17.5% 0.016 264);
+  --bg-2: oklch(21% 0.018 264);
+  --bg-3: oklch(25% 0.02 264);
+  --line: oklch(30% 0.02 264);
+  --line-strong: oklch(40% 0.03 264);
+
+  --text: oklch(96% 0.006 264);
+  --text-dim: oklch(74% 0.012 264);
+  --text-faint: oklch(58% 0.012 264);
+
+  /* Semantic state colors */
+  --c-green: oklch(80% 0.16 158);
+  --c-amber: oklch(83% 0.15 85);
+  --c-red: oklch(67% 0.2 25);
+  --c-blue: oklch(74% 0.14 248);
+
+  /* Default accent (overridden per state on .app) */
+  --accent: var(--c-blue);
+  --accent-soft: color-mix(in oklch, var(--accent) 18%, transparent);
+  --accent-line: color-mix(in oklch, var(--accent) 45%, transparent);
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "SF Pro Text",
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo",
+    "Cascadia Code", monospace;
+
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-base: 0.94rem;
+  --text-lg: 1.15rem;
+  --text-xl: 1.5rem;
+  --text-hero: clamp(2.5rem, 1.4rem + 4vw, 4.25rem);
+
+  /* Spacing / shape / motion */
+  --r-sm: 9px;
+  --r: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+
+  --dur-fast: 140ms;
+  --dur: 240ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow: 0 1px 0 oklch(100% 0 0 / 0.04) inset,
+    0 18px 40px -24px oklch(0% 0 0 / 0.7);
+  --glow: 0 0 0 1px var(--accent-line), 0 0 28px -6px var(--accent-soft);
+}
+
+/* Accent follows the live connection state */
+.app[data-state="connected"] {
+  --accent: var(--c-green);
+}
+.app[data-state="connecting"] {
+  --accent: var(--c-blue);
+}
+.app[data-state="disconnected"] {
+  --accent: var(--c-amber);
+}
+.app[data-state="error"] {
+  --accent: var(--c-red);
+}

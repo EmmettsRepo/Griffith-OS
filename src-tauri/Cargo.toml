@@ -1,0 +1,25 @@
+[package]
+name = "gos"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Griffith OS — privacy-first OS extension"
+
+[lib]
+name = "gos_lib"
+crate-type = ["staticlib", "cdylib", "lib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+arboard = "3"
+
+gos-core = { path = "../crates/gos-core" }
+gos-privacy = { path = "../crates/gos-privacy" }
+gos-platform = { path = "../crates/gos-platform" }
+gos-bridge = { path = "../crates/gos-bridge" }

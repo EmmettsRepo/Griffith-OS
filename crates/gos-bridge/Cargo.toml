@@ -1,0 +1,9 @@
+[package]
+name = "gos-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+gos-core = { path = "../gos-core" }
+serde = { workspace = true }
