@@ -3,8 +3,10 @@
 { config, pkgs, lib, ... }:
 {
   services.xserver.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  # nixos-25.05 keeps GDM/GNOME under the services.xserver.* namespace
+  # (the unprefixed services.displayManager.gnome paths land in a later release).
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
   services.xserver.xkb.layout = "us";
 
   # Default to a dark, intentional look.
