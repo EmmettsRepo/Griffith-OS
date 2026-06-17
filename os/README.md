@@ -139,6 +139,31 @@ rollbacks, the works.
 > `nixos-install --flake github:EmmettsRepo/Griffith-OS?dir=os#gos-portable-x86`
 > (append `-anon` to that name for Tor-everything by default).
 
+## 3c. Live auto-update from GitHub
+
+Portable installs **update themselves from this repo**: push a change here and the
+laptop pulls it and rebuilds within ~5 minutes — no manual steps. It's on by default
+in `gos-portable-x86` / `gos-portable-anon-x86` (via `system.autoUpgrade`, a
+`nixos-upgrade` systemd timer).
+
+- **Rollback-safe:** each cycle runs `nixos-rebuild switch`. A broken push just fails
+  the switch and the system stays on the last good generation — it can't brick the OS.
+- **Fast + reproducible:** `nixpkgs` is pinned to an exact commit in `flake.nix`, so
+  only *your* config changes move; rebuilds are small and hit the binary cache.
+- **Works in anonymous mode:** the GitHub fetch is torified by the transparent proxy.
+- **Tune or trigger it:**
+  ```bash
+  systemctl list-timers nixos-upgrade        # see the schedule / next run
+  sudo systemctl start nixos-upgrade.service # pull + rebuild right now
+  journalctl -u nixos-upgrade -f             # watch an update happen
+  ```
+  Change the cadence by setting `gos.autoUpdate.dates` (default `*:0/5` = every 5 min).
+
+> Not real-time push (the laptop can't be reached from GitHub behind NAT) — it's a
+> fast poll. Already installed an older build? Run once:
+> `sudo nixos-rebuild switch --flake github:EmmettsRepo/Griffith-OS?dir=os#gos-portable-x86 --refresh`
+> and it self-updates from then on.
+
 ## 4. Torify everything (optional gateway)
 
 Build/boot `gos-gateway` as a second VM, put both VMs on a host-only network

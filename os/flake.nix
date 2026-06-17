@@ -2,9 +2,12 @@
   description = "Griffith OS (GOS) — a privacy-hardened NixOS that runs as a VM over macOS or boots on PCs";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    # Pinned to an exact nixos-25.05 commit (not the moving branch) so the laptop's
+    # live auto-update only applies YOUR config changes against a fixed base —
+    # small, cache-friendly rebuilds. Bump this rev to pull in nixpkgs updates.
+    nixpkgs.url = "github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d";
     nixos-generators = {
-      url = "github:nix-community/nixos-generators";
+      url = "github:nix-community/nixos-generators/8946737ff703382fda7623b9fab071d037e897d5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -21,6 +24,7 @@
         ./modules/gos-tor.nix
         ./modules/gos-anti-tracking.nix
         ./modules/gos-leaktest.nix
+        ./modules/gos-autoupdate.nix
         ./modules/gos-desktop.nix
         ./modules/gos-toolchain.nix
         ./modules/gos-browser.nix
@@ -67,8 +71,14 @@
         gos-workstation-anon-x86 = mkWorkstation "x86_64-linux" [ anon ];
 
         # Bare-metal portable install (target an external SSD / PC disk).
-        gos-portable-x86 = mkPortable "x86_64-linux" [ ];
-        gos-portable-anon-x86 = mkPortable "x86_64-linux" [ anon ];
+        # Auto-updates itself from this repo so pushes show up on the laptop.
+        gos-portable-x86 = mkPortable "x86_64-linux" [
+          { gos.autoUpdate = { enable = true; flakeTarget = "gos-portable-x86"; }; }
+        ];
+        gos-portable-anon-x86 = mkPortable "x86_64-linux" [
+          anon
+          { gos.autoUpdate = { enable = true; flakeTarget = "gos-portable-anon-x86"; }; }
+        ];
 
         # Optional Whonix-style Tor gateway VM.
         gos-gateway = mkSystem "aarch64-linux" [ ./hosts/gos-gateway.nix ];
