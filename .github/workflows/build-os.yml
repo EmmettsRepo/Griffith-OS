@@ -40,6 +40,13 @@ jobs:
           nix eval --raw 'path:.#nixosConfigurations.gos-workstation-anon-x86.config.system.build.toplevel.drvPath'
           echo "GOS anonymous-mode config evaluates."
 
+      - name: Validate the bare-metal portable config evaluates
+        working-directory: os
+        run: |
+          nix eval --raw 'path:.#nixosConfigurations.gos-portable-x86.config.system.build.toplevel.drvPath'
+          nix eval --raw 'path:.#nixosConfigurations.gos-portable-anon-x86.config.system.build.toplevel.drvPath'
+          echo "GOS portable (USB/SSD) config evaluates."
+
       - name: Build bootable ISO (x86_64)
         working-directory: os
         run: nix build 'path:.#packages.x86_64-linux.iso' -L

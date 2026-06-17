@@ -111,6 +111,34 @@ nix build .#packages.aarch64-linux.qcow   # disk image for an Apple-Silicon VM
 This is the "real OS over your current OS": files cross over via `/mnt/host`,
 clipboard crosses over via SPICE — but it's a genuine Linux OS, not an app window.
 
+## 3b. Install GOS to a USB/SSD (boot it on a PC)
+
+A real, persistent GOS install on an external SSD (or a PC's own disk) that boots on
+any UEFI x86 machine — e.g. a ThinkPad X1 Carbon. Not a live ISO: full persistence,
+rollbacks, the works.
+
+1. **Get the installer ISO** — download `gos-iso-x86_64` from the latest CI run's
+   artifacts (GitHub → Actions → newest run), or build `.#packages.x86_64-linux.iso`.
+2. **Flash it to a USB stick** (≥4 GB) with balenaEtcher / Raspberry Pi Imager, or:
+   ```bash
+   sudo dd if=gos.iso of=/dev/sdX bs=4M status=progress conv=fsync   # sdX = the USB stick
+   ```
+3. **Boot the PC from the USB** (ThinkPad: tap F12 for the boot menu) → live GOS desktop.
+4. **Plug in the target SSD**, connect Wi-Fi (top-right), then run the guided installer:
+   ```bash
+   sudo gos-install
+   ```
+   It lists your disks, asks which one to use and whether to default to anonymous
+   mode, then wipes it, creates the `ESP` + `nixos` partitions, and installs GOS.
+5. **Reboot, remove the USB stick**, pick the SSD in the boot menu. Log in `gos`/`gos`,
+   run `passwd`, then `gos-leaktest`.
+
+> The installer pulls the GOS flake from GitHub, so it always lays down the current
+> definition. Prefer manual? Make `ESP` (FAT32, label `ESP`) + `nixos` (ext4, label
+> `nixos`), mount at `/mnt` + `/mnt/boot`, then
+> `nixos-install --flake github:EmmettsRepo/Griffith-OS?dir=os#gos-portable-x86`
+> (append `-anon` to that name for Tor-everything by default).
+
 ## 4. Torify everything (optional gateway)
 
 Build/boot `gos-gateway` as a second VM, put both VMs on a host-only network
